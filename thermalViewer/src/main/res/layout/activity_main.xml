@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BLACK"
+    tools:context="com.meridianinno.senxorviewer.MainActivity">
+
+    <!-- camera preview -->
+
+    <com.serenegiant.widget.UVCCameraTextureView
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@null" />
+
+    <com.meridianinno.senxorviewer.AnnotationView
+        android:id="@+id/annotation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+    <com.meridianinno.utility.StrokedTextView
+        android:id="@+id/title_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/camera_view"
+        android:layout_alignEnd="@+id/camera_view"
+        android:layout_marginEnd="5dp"
+        android:text="N/A"
+        android:textColor="#000000"
+        android:textSize="15sp" />
+
+    <com.meridianinno.utility.StrokedTextView
+        android:id="@+id/min"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/camera_view"
+        android:layout_alignTop="@+id/camera_view"
+        android:layout_marginEnd="5dp"
+        android:textColor="#000000"
+        android:textSize="8sp"
+        android:visibility="invisible" />
+
+    <com.meridianinno.utility.StrokedTextView
+        android:id="@+id/max"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/min"
+        android:layout_alignStart="@+id/min"
+        android:layout_marginEnd="5dp"
+        android:textColor="#000000"
+        android:textSize="8sp"
+        android:visibility="invisible" />
+
+    <com.meridianinno.utility.StrokedTextView
+        android:id="@+id/stdev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/max"
+        android:layout_alignStart="@+id/max"
+        android:layout_marginEnd="5dp"
+        android:textColor="#000000"
+        android:textSize="8sp"
+        android:visibility="invisible" />
+
+    <com.meridianinno.android.colorbar.ColorBar
+        android:id="@+id/colorBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/camera_view"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="false"
+        android:visibility="invisible"
+        app:colorSeeds="@array/basic_colors" />
+
+    <ImageView
+        android:id="@+id/crosshair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/crosshair" />
+    <!-- x/y shift text boxes -->
+
+    <!-- top bar -->
+
+    <TextView
+        android:id="@+id/no_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="No camera detected"
+        android:textColor="@color/WHITE"
+        android:textSize="@dimen/no_camera_font_size" />
+
+    <TextView
+        android:id="@+id/thermal_shift_top"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/top_bar"
+        android:layout_centerHorizontal="true"
+        android:background="@color/WHITE"
+        android:gravity="center"
+        android:text="10"
+        android:textColor="@color/BLUE"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/thermal_shift_bottom"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/bottom_bar"
+        android:layout_alignStart="@+id/thermal_shift_top"
+        android:background="@color/WHITE"
+        android:gravity="center"
+        android:text="10"
+        android:textColor="@color/BLUE"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/thermal_shift_left"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="@color/WHITE"
+        android:gravity="center"
+        android:text="10"
+        android:textColor="@color/BLUE"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/thermal_shift_right"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@color/WHITE"
+        android:gravity="center"
+        android:text="10"
+        android:textColor="@color/BLUE"
+        android:textSize="20sp" />
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/topBar"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="SenXorViewer"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:visibility="visible" />
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/app_title"
+            android:layout_centerHorizontal="true"
+            android:text="version"
+            android:textColor="@color/WHITE"
+            android:textSize="8sp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/company_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/flip_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignTop="@+id/settings_button"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="false"
+            android:layout_marginTop="0dp"
+            android:background="@null"
+            android:src="@drawable/ic_flip" />
+
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:src="@drawable/ic_settings" />
+
+    </RelativeLayout>
+
+    <!-- bottom bar -->
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@color/bottomBar"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:weightSum="5">
+
+        <ImageButton
+            android:id="@+id/gallery_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:background="@null"
+            android:src="@drawable/ic_gallery" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/capture_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_camera" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/record_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@null"
+            android:src="@drawable/ic_video" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/display_mode_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:background="@null"
+            android:src="@drawable/ic_filters" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/over_temp_alarm"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:gravity="center"
+            android:text="HOT"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/under_temp_alarm"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:gravity="center"
+            android:text="COLD"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/adaptiveCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/thermal_shift_top"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="-1dp"
+        android:checked="false"
+        android:shadowColor="@color/WHITE"
+        android:text="Dynamic Range"
+        android:textColor="@color/WHITE"
+        android:textSize="10sp" />
+
+
+</RelativeLayout>

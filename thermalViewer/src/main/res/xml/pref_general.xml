@@ -1,0 +1,49 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- TODO: keys should also be @strings -->
+
+    <ListPreference
+        android:key="@string/pref_color_palette_key"
+        android:title="@string/pref_color_palette_title"
+        android:defaultValue="@string/pref_color_palette_default"
+        android:entries="@array/pref_color_palette_entries"
+        android:entryValues="@array/pref_color_palette_values"
+        android:summary="%s" />
+
+    <ListPreference
+        android:key="@string/pref_temp_unit_key"
+        android:title="@string/pref_temp_unit_title"
+        android:defaultValue="@string/pref_temp_unit_default"
+        android:entries="@array/pref_temp_unit_entries"
+        android:entryValues="@array/pref_temp_unit_values"
+        android:summary="%s" />
+    <CheckBoxPreference
+        android:key="@string/pref_face_detect_enabled_key"
+        android:title="@string/pref_face_detect_enabled_title"
+        android:defaultValue="@string/pref_face_detect_enabled_default" />
+
+    <CheckBoxPreference
+        android:key="@string/pref_over_temp_alarm_enabled_key"
+        android:title="@string/pref_over_temp_alarm_enabled_title"
+        android:defaultValue="@string/pref_alarm_enabled_default" />
+
+    <EditTextPreference
+        android:dependency="@string/pref_over_temp_alarm_enabled_key"
+        android:key="@string/pref_over_temp_alarm_value_key"
+        android:title="@string/pref_over_temp_alarm_value_title"
+        android:defaultValue="@string/pref_over_temp_alarm_value_default"
+        android:inputType="numberDecimal" />
+
+    <CheckBoxPreference
+        android:key="@string/pref_under_temp_alarm_enabled_key"
+        android:title="@string/pref_under_temp_alarm_enabled_title"
+        android:defaultValue="@string/pref_alarm_enabled_default" />
+
+    <EditTextPreference
+        android:dependency="@string/pref_under_temp_alarm_enabled_key"
+        android:key="@string/pref_under_temp_alarm_value_key"
+        android:title="@string/pref_under_temp_alarm_value_title"
+        android:defaultValue="@string/pref_under_temp_alarm_value_default"
+        android:inputType="numberDecimal" />
+
+</PreferenceScreen>

@@ -1,0 +1,26 @@
+apply plugin: 'com.android.library'
+group='com.github.rtugeek'
+android {
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 6
+        versionName "1.7.1"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:26.0.2'
+}

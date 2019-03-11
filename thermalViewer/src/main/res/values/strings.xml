@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">SenXorViewer</string>
+    <string name="crash_toast_text">Crash detected ! Send E-mail report to developer !</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Temperature Unit Strings -->
+    <string name="degree_c_entry">Celsius</string>
+    <string name="degree_c_value">1</string>
+    <string name="degree_f_entry">Fahrenheit</string>
+    <string name="degree_f_value">2</string>
+    <string name="kelvin_entry">Kelvin</string>
+    <string name="kelvin_value">3</string>
+    <string name="pref_temp_unit_key">pref_temp_unit</string>
+    <string name="pref_temp_unit_title">Temperature Display Unit</string>
+    <string name="pref_temp_unit_default">@string/degree_c_value</string>
+    <string-array name="pref_temp_unit_entries">
+        <item>@string/degree_c_entry</item>
+        <item>@string/degree_f_entry</item>
+        <!-- TODO: add Kelvin -->
+    </string-array>
+    <string-array name="pref_temp_unit_values">
+        <item>@string/degree_c_value</item>
+        <item>@string/degree_f_value</item>
+        <!-- TODO: add Kelvin -->
+    </string-array>
+
+    <!-- Color Palette Strings -->
+    <string name="pref_color_palette_key">pref_color_palette</string>
+    <string name="pref_color_palette_title">Color Palette</string>
+    <!-- basic (Original palette) -->
+    <string name="color_palette_basic_entry">Basic</string>
+    <string name="color_palette_basic_value">1</string>
+    <!-- Heated iron scale -->
+    <string name="color_palette_heatiron_entry">HeatIron</string>
+    <string name="color_palette_heatiron_value">2</string>
+    <!-- Viridis scale -->
+    <string name="color_palette_viridis_entry">Viridis</string>
+    <string name="color_palette_viridis_value">3</string>
+    <!-- Magma scale -->
+    <string name="color_palette_magma_entry">Magma</string>
+    <string name="color_palette_magma_value">4</string>
+    <!-- Parula scale -->
+    <string name="color_palette_parula_entry">Parula</string>
+    <string name="color_palette_parula_value">5</string>
+    <!-- Bezier scale -->
+    <string name="color_palette_bezier_entry">Bezier</string>
+    <string name="color_palette_bezier_value">6</string>
+    <!-- Brewer Blues scale -->
+    <string name="color_palette_brewerblues_entry">BrewerBlues</string>
+    <string name="color_palette_brewerblues_value">7</string>
+    <!-- BW scale -->
+    <string name="color_palette_BW_entry">BW</string>
+    <string name="color_palette_BW_value">8</string>
+    <!-- Autumn scale -->
+    <string name="color_palette_autumn_entry">Autumn</string>
+    <string name="color_palette_autumn_value">9</string>
+    <!-- Cool scale -->
+    <string name="color_palette_cool_entry">Cool</string>
+    <string name="color_palette_cool_value">10</string>
+    <!-- HSV scale -->
+    <string name="color_palette_hsv_entry">HSV</string>
+    <string name="color_palette_hsv_value">11</string>
+    <!-- Jet scale -->
+    <string name="color_palette_jet_entry">Jet</string>
+    <string name="color_palette_jet_value">12</string>
+    <!-- Spring scale -->
+    <string name="color_palette_spring_entry">Spring</string>
+    <string name="color_palette_spring_value">13</string>
+    <!-- TODO: Add future color palettes here -->
+    <string name="pref_color_palette_default">@string/color_palette_basic_value</string>
+    <string-array name="pref_color_palette_entries">
+        <item>@string/color_palette_basic_entry</item>
+        <item>@string/color_palette_heatiron_entry</item>
+        <item>@string/color_palette_viridis_entry</item>
+        <item>@string/color_palette_magma_entry</item>
+        <item>@string/color_palette_parula_entry</item>
+        <item>@string/color_palette_bezier_entry</item>
+        <item>@string/color_palette_brewerblues_entry</item>
+        <item>@string/color_palette_BW_entry</item>
+        <item>@string/color_palette_autumn_entry</item>
+        <item>@string/color_palette_cool_entry</item>
+        <item>@string/color_palette_hsv_entry</item>
+        <item>@string/color_palette_jet_entry</item>
+        <item>@string/color_palette_spring_entry</item>
+        <!-- TODO: Add future color palettes here -->
+    </string-array>
+    <string-array name="pref_color_palette_values">
+        <item>@string/color_palette_basic_value</item>
+        <item>@string/color_palette_heatiron_value</item>
+        <item>@string/color_palette_viridis_value</item>
+        <item>@string/color_palette_magma_value</item>
+        <item>@string/color_palette_parula_value</item>
+        <item>@string/color_palette_bezier_value</item>
+        <item>@string/color_palette_brewerblues_value</item>
+        <item>@string/color_palette_BW_value</item>
+        <item>@string/color_palette_autumn_value</item>
+        <item>@string/color_palette_cool_value</item>
+        <item>@string/color_palette_hsv_value</item>
+        <item>@string/color_palette_jet_value</item>
+        <item>@string/color_palette_spring_value</item>
+        <!-- TODO: Add indices of future color palettes here -->
+    </string-array>
+
+    <!-- Face Detection Strings -->
+    <string name="pref_face_detect_enabled_key">pref_face_detect_enabled</string>
+    <string name="pref_face_detect_enabled_title">Face Detection (beta)</string>
+    <string name="pref_face_detect_enabled_default">false</string>
+
+    <!-- Over and under temperature alarms -->
+    <string name="pref_alarm_enabled_default">false</string>
+
+    <string name="pref_over_temp_alarm_enabled_key">pref_over_temp_alarm_enabled</string>
+    <string name="pref_over_temp_alarm_enabled_title">Over-temperature Alarm</string>
+    <string name="pref_over_temp_alarm_value_key">pref_over_temp_alarm_value</string>
+    <string name="pref_over_temp_alarm_value_title">Alarm Triggering Above:</string>
+    <string name="pref_over_temp_alarm_value_default">30</string>
+
+    <string name="pref_under_temp_alarm_enabled_key">pref_under_temp_alarm_enabled</string>
+    <string name="pref_under_temp_alarm_enabled_title">Under-temperature Alarm</string>
+    <string name="pref_under_temp_alarm_value_key">pref_under_temp_alarm_value</string>
+    <string name="pref_under_temp_alarm_value_title">Alarm Triggering Below:</string>
+    <string name="pref_under_temp_alarm_value_default">15</string>
+
+</resources>

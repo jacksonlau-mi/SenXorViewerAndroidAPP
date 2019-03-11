@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="topBar">#FF2A3694</color>
+    <color name="bottomBar">#FF2A3694</color>
+
+    <array name="basic_colors">
+        <item>#008C50</item>
+        <item>#198E00</item>
+        <item>#52C200</item>
+        <item>#9DDF00</item>
+        <item>#E0DF00</item>
+        <item>#E09900</item>
+        <item>#E04C00</item>
+        <item>#CE0000</item>
+        <item>#830000</item>
+        <item>#500000</item>
+    </array>
+
+    <array name="heatiron_colors">
+        <item>#4C4A64</item>
+        <item>#4F4778</item>
+        <item>#7E4287</item>
+        <item>#A64785</item>
+        <item>#DF3D66</item>
+        <item>#E36B1F</item>
+        <item>#EE7E14</item>
+        <item>#F9B213</item>
+        <item>#F5D70C</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="viridis_colors">
+        <item>#410754</item>
+        <item>#482979</item>
+        <item>#3E4788</item>
+        <item>#33628E</item>
+        <item>#26828F</item>
+        <item>#1E9B89</item>
+        <item>#3AB976</item>
+        <item>#76D051</item>
+        <item>#BBDD27</item>
+        <item>#FEFE8B</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="magma_colors">
+        <item>#000000</item>
+        <item>#19103D</item>
+        <item>#411376</item>
+        <item>#6D1D80</item>
+        <item>#992E80</item>
+        <item>#D1426E</item>
+        <item>#F56C5C</item>
+        <item>#FD9D6D</item>
+        <item>#FFCA8D</item>
+        <item>#FCFCC8</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="parula_colors">
+        <item>#352A88</item>
+        <item>#0461E0</item>
+        <item>#1482D4</item>
+        <item>#06A1CC</item>
+        <item>#24B4AA</item>
+        <item>#63BE85</item>
+        <item>#A9BD68</item>
+        <item>#E6B94F</item>
+        <item>#FCCB2F</item>
+        <item>#FDFEC3</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="bezier_colors">
+        <item>#000000</item>
+        <item>#481F10</item>
+        <item>#852F10</item>
+        <item>#BF5B14</item>
+        <item>#DE7B1C</item>
+        <item>#FCAC38</item>
+        <item>#FFC95E</item>
+        <item>#FFE893</item>
+        <item>#FFF6BE</item>
+        <item>#FDFEFF</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="brewerblues_colors">
+        <item>#031024</item>
+        <item>#084991</item>
+        <item>#1866AC</item>
+        <item>#3686C0</item>
+        <item>#529DCC</item>
+        <item>#83BBDA</item>
+        <item>#ABCFE5</item>
+        <item>#CBDEF0</item>
+        <item>#E2EEF8</item>
+        <item>#FFFFFF</item>
+        <item>#FFFFFF</item>
+    </array>
+
+    <array name="bw_colors">
+        <item>#000000</item>
+        <item>#181818</item>
+        <item>#303030</item>
+        <item>#484848</item>
+        <item>#606060</item>
+        <item>#787878</item>
+        <item>#909090</item>
+        <item>#A8A8A8</item>
+        <item>#C0C0C0</item>
+        <item>#D8D8D8</item>
+        <item>#F0F0F0</item>
+    </array>
+
+    <array name="autumn_colors">
+        <item>#FF0000</item>
+        <item>#FF1E00</item>
+        <item>#FE3C00</item>
+        <item>#FF5D00</item>
+        <item>#FF7700</item>
+        <item>#FF9302</item>
+        <item>#FFAF01</item>
+        <item>#FFC800</item>
+        <item>#FFE400</item>
+        <item>#FFF000</item>
+        <item>#FFFF00</item>
+    </array>
+
+    <array name="cool_colors">
+        <item>#00FFFF</item>
+        <item>#1CE2FF</item>
+        <item>#38C6FF</item>
+        <item>#54AAFF</item>
+        <item>#6F8FFF</item>
+        <item>#8F70FF</item>
+        <item>#A856FF</item>
+        <item>#C639FF</item>
+        <item>#E21FFF</item>
+        <item>#FF1FFF</item>
+        <item>#FF00FF</item>
+    </array>
+
+    <array name="hsv_colors">
+        <item>#FF0000</item>
+        <item>#FFBA00</item>
+        <item>#9AFF00</item>
+        <item>#00FF08</item>
+        <item>#00FFAE</item>
+        <item>#008EFF</item>
+        <item>#0E00FF</item>
+        <item>#BE00FF</item>
+        <item>#FF00A3</item>
+        <item>#FF0064</item>
+        <item>#FF0000</item>
+    </array>
+
+    <array name="jet_colors">
+        <item>#000092</item>
+        <item>#0000F6</item>
+        <item>#0063FF</item>
+        <item>#00D5FF</item>
+        <item>#51FFAF</item>
+        <item>#C3FF3B</item>
+        <item>#FFC701</item>
+        <item>#FF5B00</item>
+        <item>#E80000</item>
+        <item>#820000</item>
+        <item>#320000</item>
+    </array>
+
+    <array name="spring_colors">
+        <item>#FFFF67</item>
+        <item>#E4F165</item>
+        <item>#C9E366</item>
+        <item>#ACD666</item>
+        <item>#92C866</item>
+        <item>#76BB66</item>
+        <item>#5BAC66</item>
+        <item>#3C9E66</item>
+        <item>#1E8E66</item>
+        <item>#008166</item>
+        <item>#005050</item>
+    </array>
+</resources>
