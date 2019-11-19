@@ -894,69 +894,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         if (DEBUG) Log.v(TAG, "onDialogResult:canceled=" + canceled);
     }
 
-    // Toast box
-    //================================================================================
-    private Toast mToast;
-    /**
-     * @param msg
-     */
-    private void showToastAtPos(final int xpos, final int ypos, final String msg, final Object... args) {
-        removeFromUiThread(mShowToastTask);
-        mShowToastTask = new MainActivity.ShowToastTask(xpos, ypos, msg, args);
-        runOnUiThread(mShowToastTask, 0);
-    }
-
-    private void clearToastAtPos() {
-        removeFromUiThread(mShowToastTask);
-        mShowToastTask = null;
-        try {
-            if (mToast != null) {
-                mToast.cancel();
-                mToast = null;
-            }
-        } catch (final Exception e) {
-            // ignore
-        }
-    }
-
-    private MainActivity.ShowToastTask mShowToastTask;
-    private final class ShowToastTask implements Runnable {
-        final int xpos, ypos;
-        final String msg;
-        final Object args;
-        private ShowToastTask(final int xpos, final int ypos, final String msg, final Object... args) {
-            this.xpos = xpos;
-            this.ypos = ypos;
-            this.msg = msg;
-            this.args = args;
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (mToast != null) {
-                    mToast.cancel();
-                    mToast = null;
-                }
-                // generate text
-                String displayMsg = (args != null) ? String.format(msg, args) : msg;
-                LayoutInflater inflater = getLayoutInflater();
-                View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById((R.id.custom_toast_container)));
-                TextView text = (TextView) layout.findViewById(R.id.text);
-                text.setText(displayMsg);
-
-                mToast = new Toast(getApplicationContext());
-                mToast.setDuration(Toast.LENGTH_LONG);
-                mToast.setGravity(Gravity.TOP | Gravity.LEFT, xpos, ypos);
-                mToast.setView(layout);
-                mToast.show();
-
-            } catch (final Exception e) {
-                // ignore
-            }
-        }
-    }
-
     //================================================================================
     private boolean isActive() {
         return mCameraHandler != null && mCameraHandler.isOpened();
@@ -1069,19 +1006,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
 
         return String.format("%2.1f\u00B0"+suffix, temp);
     }
-
-    private void updateItems() {
-        runOnUiThread(mUpdateItemsOnUITask, 100);
-    }
-
-    private final Runnable mUpdateItemsOnUITask = new Runnable() {
-        @Override
-        public void run() {
-        if (isFinishing()) return;
-        final int visible_active = isActive() ? View.VISIBLE : View.INVISIBLE;
-        mFlipButton.setVisibility(View.VISIBLE);
-        }
-    };
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -1223,7 +1147,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                     UI_setVisability(true);
                 }
             });
-            updateItems();
             previewActive = true;
 
             if (mCameraHandler != null) {
