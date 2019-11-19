@@ -1067,7 +1067,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         if (mShowCIS && mShowThermal) {
             mShowCIS = true;
             mShowThermal = false;
-            //mCrosshair.setVisibility(View.INVISIBLE);
+
             // save current shift values to Preferences
             changePreference("x_thermal_shift", xThermalImageShift);
             changePreference("y_thermal_shift", yThermalImageShift);
@@ -1107,10 +1107,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
             mCameraHandler.setCmosEnable(mShowCIS);
             mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
         }
-
-        // remember in preferences TODO
-        //changePreference("show_cis", mShowCIS);
-        //changePreference("show_thermal", mShowThermal);
 
         // hide/show temperature
         runOnUiThread(new Runnable() {
