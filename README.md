@@ -1,4 +1,6 @@
 # SenXorViewer
+The SenXorViewer APP is the release version of the android software from Meridian Innovation Limited SenXorViewer V1.64.
+Details please check the SenXorViewer Android App Note.
 
 ## Setup
 
@@ -26,9 +28,3 @@ ndk.dir= C\:\\Users\\Lenovo\\android-ndk-r14b
 ```
 cp -r SenXorViewer/opencv_jniLibs/x86 ThermalViewer/thermalViewer/src/main/jniLibs
 ```
-
-## Build
-
-Android Studio will build thermalViewer-debug.apk due to the current directory name structure.
-However, the apk application name is SenXorViewer.
-In order to match the apk name and the app name, rename "thermalViewer-debug.apk" to "SenXorViewer.apk" after the Android Studio build process.
