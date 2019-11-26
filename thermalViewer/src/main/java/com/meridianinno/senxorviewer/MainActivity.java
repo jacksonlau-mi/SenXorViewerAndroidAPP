@@ -562,7 +562,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                         pointY = (int) motionEvent.getY();
                         break;
                     case R.id.app_title:
-                        mCameraHandler.setIsAutoScale(true);
                         if (motionEvent.getAction() != MotionEvent.ACTION_DOWN) {
                             return false;
                         }
