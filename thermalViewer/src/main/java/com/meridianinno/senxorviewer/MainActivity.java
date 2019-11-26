@@ -2,7 +2,6 @@ package com.meridianinno.senxorviewer;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,27 +12,18 @@ import org.opencv.core.Mat;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.hardware.usb.UsbManager;
 
 import java.nio.ByteBuffer;
@@ -45,8 +35,6 @@ import android.graphics.Bitmap;
 
 import com.meridianinno.Model.Temp_stat;
 import com.meridianinno.facedetection.FaceDetect;
-import com.meridianinno.android.colorbar.ColorBar;
-import com.meridianinno.utility.ConversionHelper;
 import com.meridianinno.utility.UpsampleThermal;
 import com.serenegiant.common.BaseActivity;
 import com.serenegiant.usb.CameraDialog;
@@ -61,7 +49,6 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.serenegiant.usb.UVCCamera.PIXEL_FORMAT_RGBX;
 import static java.lang.Thread.sleep;
@@ -115,7 +102,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
     private CameraViewInterface mUVCCameraView;
     // for annotation overlay
     private AnnotationView mAnnotationView;
-    private View mTopBar;
     // Title String
     private TextView mAppTitleView;
     // UI buttons
@@ -132,6 +118,9 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
     private UsbManager usbmanager;
     private boolean previewActive;
 
+    // Clicked coordinate
+    private int pointX, pointY;
+
     // mScreenBitmap for duplicating image on screen
     // use PIXEL_FORMAT_RGBX/ARGB_8888 if we want callback image to contain thermal/cis. Use PIXEL_FORMAT_RGB565 / ARGB_565 if CIS only
     private Bitmap mScreenBitmap = Bitmap.createBitmap(UVCCamera.DEFAULT_PREVIEW_WIDTH, UVCCamera.DEFAULT_PREVIEW_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -146,29 +135,21 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
     private boolean isFlip;
 
     // Statistical text
-    private TextView mTempTextView, mVersionTextView, mTempStd, mTempMin, mTempMax;
+    private TextView mTempTextView;
 
     // thermal shifting
     private boolean mShowThermalShiftEditMode;
     private TextView mThermalShiftLeft, mThermalShiftRight, mThermalShiftTop, mThermalShiftBottom;
     private int xThermalImageShift, yThermalImageShift;                                                     // amount of shift to thermal images in order to align with cis
 
-    // Alarms
-    private TextView mAlarmOverTemp, mAlarmUnderTemp;
-    private Vibrator mVib;
-
     // Preferences
     private SharedPreferences mSP;
-    private ConversionHelper mHelper;
 
     // Drag and Drop
-    protected ImageView mCrosshair;
     private UVCCameraTextureView mCameraView;
     private RelativeLayout mActivityMain;
-
-    private CheckBox mCheckBox;
-    private ColorBar mColorBar;
     private int paletteNum = 1;
+    private float scaleMin = 21.0f, scaleMax = 36.0f;
 
     private String tempStr = "";
     private Temp_stat temp_stat = new Temp_stat();
@@ -197,7 +178,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         setContentView(R.layout.activity_main);
         mActivityMain = findViewById(R.id.activity_main);
         mCameraView = findViewById(R.id.camera_view);
-        mTopBar = findViewById(R.id.top_bar);
 
         mUVCCameraView = (CameraViewInterface)mCameraView;
         mUVCCameraView.setAspectRatio(PREVIEW_WIDTH / (float)PREVIEW_HEIGHT);
@@ -241,34 +221,13 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         mThermalShiftTop.setVisibility(View.INVISIBLE);
         mThermalShiftBottom = (TextView) findViewById(R.id.thermal_shift_bottom);
         mThermalShiftBottom.setVisibility(View.INVISIBLE);
-        mVersionTextView = (TextView) findViewById(R.id.version);
-        mVersionTextView.setText("V " + BuildConfig.VERSION_NAME);
 
         mTempTextView = (TextView) findViewById(R.id.title_temperature);
-        mTempStd = (TextView) findViewById(R.id.stdev);
-        mTempMin = (TextView) findViewById(R.id.min);
-        mTempMax = (TextView) findViewById(R.id.max);
         mAppTitleView = (TextView) findViewById(R.id.app_title);
 
-        mAlarmOverTemp = findViewById(R.id.over_temp_alarm);
-        mAlarmUnderTemp = findViewById(R.id.under_temp_alarm);
-        mVib = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-        resetAlarmAppearance();
-
         mCameraDetected = findViewById(R.id.no_camera);
-        mCrosshair = findViewById(R.id.crosshair);
 
         mCameraView.setOnDragListener(new MyDragListener());
-        mCrosshair.setTag("DRAG CROSSHAIR");
-
-        mCheckBox = findViewById(R.id.adaptiveCheckbox);
-        mCheckBox.setVisibility(View.INVISIBLE);
-
-        mColorBar = findViewById(R.id.colorBar);
-
-        mColorBar.setColorBarPosition(50);
-        mColorBar.setBarHeight(7);
-        mColorBar.setColorSeeds(R.array.basic_colors);
 
         //   Set onTouchListener
         mThermalShiftLeft.setOnTouchListener(new MyTouchListener());
@@ -277,17 +236,10 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         mThermalShiftBottom.setOnTouchListener(new MyTouchListener());
         mAppTitleView.setOnTouchListener(new MyTouchListener());
         mCameraView.setOnTouchListener(new MyTouchListener());
-        mCrosshair.setOnTouchListener(new MyTouchListener());
-        mColorBar.setOnTouchListener(new MyTouchListener());
 
         // get preference settings
         mSP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        // create the ConversionHelper
-        mHelper = new ConversionHelper(
-                getString(R.string.degree_c_value),
-                getString(R.string.degree_f_value),
-                getString(R.string.kelvin_value));
         // Thermal/CIS modes
         mShowCIS = true;
         mShowThermal = false;
@@ -297,13 +249,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
                 USE_SURFACE_ENCODER ? 0 : 1, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_MODE);
 
-        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean input) {
-                mCameraHandler.setParaletteHDR(input);
-            }
-        });
-
         // create handler to receive callback frames
         mFrameCallBack = new IFrameCallback() {
             @Override
@@ -312,42 +257,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
 
                 // save a copy of the bitmap
                 mScreenBitmap.copyPixelsFromBuffer(frame);  // note, format from frame to mScreenBitmap must match
-
-                Boolean isOverTempAlarmEnabled = mSP.getBoolean(
-                        getString(R.string.pref_over_temp_alarm_enabled_key), false);
-                Boolean isUnderTempAlarmEnabled = mSP.getBoolean(
-                        getString(R.string.pref_under_temp_alarm_enabled_key), false);
-                if (isOverTempAlarmEnabled || isUnderTempAlarmEnabled)
-                {
-                    final double upperThreshold = Double.valueOf(mSP.getString(
-                            getString(R.string.pref_over_temp_alarm_value_key), ""));
-                    final double lowerThreshold = Double.valueOf(mSP.getString(
-                            getString(R.string.pref_under_temp_alarm_value_key), ""));
-                    final String strC = getString(R.string.degree_c_value);
-                    final String strUnit = mSP.getString(
-                            getString(R.string.pref_temp_unit_key), "");
-                    final boolean isConvertUnit = !strC.equals(strUnit);
-                    boolean isOverTemp = false;
-                    boolean isUnderTemp = false;
-                    int idx = 0;
-                    while ((idx < thermal_data.length) && (
-                            (isOverTempAlarmEnabled && !isOverTemp) ||
-                                    (isUnderTempAlarmEnabled && !isUnderTemp)))  {
-
-                        double temp = (double)thermal_data[idx]/10.0; // currently in Celsius
-                        temp = isConvertUnit?
-                                mHelper.convertTemperatureByUnitString(temp, strC, strUnit): temp;
-                        isOverTemp = isOverTempAlarmEnabled && (isOverTemp || (temp > upperThreshold));
-                        isUnderTemp = isUnderTempAlarmEnabled && (isUnderTemp || (temp < lowerThreshold));
-                        idx++;
-                    }
-                    boolean isTriggerAlarmOverTemp = (isOverTempAlarmEnabled && isOverTemp);
-                    boolean isTriggerAlarmUnderTemp = (isUnderTempAlarmEnabled && isUnderTemp);
-                    runOnUiThread(new AlarmTask(isTriggerAlarmOverTemp, isTriggerAlarmUnderTemp));
-                } else {
-                    mAlarmOverTemp.setBackgroundColor(Color.TRANSPARENT);
-                    mAlarmUnderTemp.setBackgroundColor(Color.TRANSPARENT);
-                }
 
                 // detect face
                 List<FaceDetect.DetectResult> detectResults = new ArrayList<>();
@@ -414,7 +323,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         }else{
             mCameraDetected.setVisibility(View.VISIBLE);
             UI_setVisability(false);
-            resetAlarmAppearance();
         }
     }
 
@@ -464,7 +372,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         if (DEBUG) Log.d(TAG, "onDestroy:");
         mCameraHandler.close();
         UI_setVisability(false);
-        resetAlarmAppearance();
         // unregister temperature listener
         if (mCameraHandler != null) {
             mCameraHandler.release();
@@ -511,7 +418,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                     mCameraHandler.open(ctrlBlock);
                     sleep(2500);
                     // Init Meridian Params
-                    mCameraHandler.SetMeridianParams(getColorPaletteNum(), 0, 0);
+                    mCameraHandler.setMeridianParams(getColorPaletteNum(), 0, 0);
                     startPreview();
                 }
             } catch (InterruptedException e) {
@@ -585,7 +492,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                     if (mCameraHandler.isOpened()) {
                         //take photo
                         if (checkPermissionWriteExternalStorage()) {
-                            mCameraHandler.setCaptureElement(tempStr, mCrosshair,isFlip);
+                            mCameraHandler.setCaptureElement(isFlip);
                             mCameraHandler.captureStill();
                         }
                     }
@@ -637,14 +544,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                     }
                     // Annotation View
                     isFlip = !isFlip;
-
-                    // Crosshair mark
-                    if(mCrosshair.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
-                        Log.d(TAG, Float.toString(mCameraView.getWidth()));
-                        mCrosshair.setX(mCameraView.getWidth() - (mCrosshair.getX() - mTopBar.getWidth()) + mCrosshair.getWidth());
-                    }
-                    else
-                        mCrosshair.setX(mCameraView.getWidth() - (mCrosshair.getX() + mCrosshair.getWidth()));
                     break;
             }
         }
@@ -657,43 +556,13 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             final int id = view.getId();
-            if(id == R.id.camera_view || id == R.id.crosshair) {
-                if (motionEvent.getAction() != MotionEvent.ACTION_DOWN) {
-                    return false;
-                }
-                int pointX = (int) motionEvent.getX() - mCrosshair.getWidth() / 2;
-                int pointY = (int) motionEvent.getY() - mCrosshair.getHeight() / 2;
-                //mPos.setText("(" + motionEvent.getRawX() + "," + motionEvent.getRawY() + ")");
-                View focusView = view;
-                mCrosshair.setVisibility(View.INVISIBLE);
-                // focusView setting
-                if (view instanceof UVCCameraTextureView) {
-                    //mTextView.setText("ViewGroup instance onTouch()");
-                    focusView = mCrosshair;
-                    mCrosshair.setX(pointX);
-                    mCrosshair.setY(pointY);
-                }
-
-                // Setup drag shadow
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    ClipData data = ClipData.newPlainText("", "");
-                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(focusView);
-                    focusView.startDrag(data, shadowBuilder, focusView, 0);
-                }
-            }
-            else {
                 switch (id) {
-                    case R.id.colorBar:
-                        if (motionEvent.getAction() != MotionEvent.ACTION_DOWN) {
-                            return false;
-                        }
-                        paletteNum = (paletteNum + 1) % getResources().getStringArray(R.array.pref_color_palette_entries).length;
-                        setColorBar(paletteNum);
-                        //mCameraHandler.stopPreview();
-                        changePreference(getString(R.string.pref_color_palette_key),Integer.toString(paletteNum));
-                        mCameraHandler.SetMeridianParams(paletteNum, xThermalImageShift, yThermalImageShift);
+                    case R.id.camera_view:
+                        pointX = (int) motionEvent.getX();
+                        pointY = (int) motionEvent.getY();
                         break;
                     case R.id.app_title:
+                        mCameraHandler.setIsAutoScale(true);
                         if (motionEvent.getAction() != MotionEvent.ACTION_DOWN) {
                             return false;
                         }
@@ -710,10 +579,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                                 mThermalShiftBottom.setText(Integer.toString(yThermalImageShift));
                                 mThermalShiftBottom.setVisibility(View.VISIBLE);
                             } else {
-                                // save current shift values to Preferences
-                                changePreference("x_thermal_shift", xThermalImageShift);
-                                changePreference("y_thermal_shift", yThermalImageShift);
-
                                 mThermalShiftLeft.setVisibility(View.INVISIBLE);
                                 mThermalShiftRight.setVisibility(View.INVISIBLE);
                                 mThermalShiftTop.setVisibility(View.INVISIBLE);
@@ -726,43 +591,54 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                         if (xThermalImageShift <= -PREVIEW_WIDTH) {
                             xThermalImageShift = -PREVIEW_WIDTH + 1;
                         }
-                        mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
+                        mCameraHandler.setMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
                         mThermalShiftLeft.setText(Integer.toString(xThermalImageShift));
                         mThermalShiftRight.setText(Integer.toString(xThermalImageShift));
                         Log.d(TAG, "Thermal shift x by -1 to "+xThermalImageShift);
+
+                        //mCameraHandler.setPaletteRange(scaleMin, --scaleMax);
+                        //Log.e(TAG,   scaleMin + " | " + scaleMax);
                         break;
                     case R.id.thermal_shift_right:
                         xThermalImageShift++;
                         if (xThermalImageShift >= PREVIEW_WIDTH) {
                             xThermalImageShift = PREVIEW_WIDTH - 1;
                         }
-                        mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
+                        mCameraHandler.setMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
                         mThermalShiftLeft.setText(Integer.toString(xThermalImageShift));
                         mThermalShiftRight.setText(Integer.toString(xThermalImageShift));
                         Log.d(TAG, "Thermal shift x by +1 to "+xThermalImageShift);
+
+                        //mCameraHandler.setPaletteRange(scaleMin, ++scaleMax);
+                        //Log.e(TAG,   scaleMin + " | " + scaleMax);
                         break;
                     case R.id.thermal_shift_top:
                         yThermalImageShift--;
                         if (yThermalImageShift <= -PREVIEW_HEIGHT) {
                             yThermalImageShift = -PREVIEW_HEIGHT + 1;
                         }
-                        mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
+                        mCameraHandler.setMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
                         mThermalShiftTop.setText(Integer.toString(yThermalImageShift));
                         mThermalShiftBottom.setText(Integer.toString(yThermalImageShift));
                         Log.d(TAG, "Thermal shift y by -1 to "+yThermalImageShift);
+
+                        //mCameraHandler.setPaletteRange(--scaleMin, scaleMax);
+                        //Log.e(TAG,   scaleMin + " | " + scaleMax);
                         break;
                     case R.id.thermal_shift_bottom:
                         yThermalImageShift++;
                         if (yThermalImageShift >= PREVIEW_HEIGHT) {
                             yThermalImageShift = PREVIEW_HEIGHT - 1;
                         }
-                        mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
+                        mCameraHandler.setMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
                         mThermalShiftTop.setText(Integer.toString(yThermalImageShift));
                         mThermalShiftBottom.setText(Integer.toString(yThermalImageShift));
                         Log.d(TAG, "Thermal shift y by +1 to "+yThermalImageShift);
+
+                        //mCameraHandler.setPaletteRange(++scaleMin, scaleMax);
+                        //Log.e(TAG,   scaleMin + " | " + scaleMax);
                         break;
                 }
-            }
             // The flag saying whether keep this event after running the trigger codes, true means will be happened again.
             return true;
         }
@@ -799,15 +675,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                         else
                             view.setX((v.getWidth() - event.getX() - view.getWidth() / 2));
                         view.setY((event.getY() - view.getHeight() / 2) + (owner.getHeight() - v.getHeight()) / 2);
-                    } else if(view.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
-                        if (!isFlip) {
-                            view.setX((event.getX() - view.getWidth() / 2) + mTopBar.getWidth());
-                        }
-                        else
-                            view.setX(v.getWidth() - event.getX() - view.getWidth() / 2 + mTopBar.getWidth());
-                        view.setY((event.getY() - view.getHeight() / 2) + (owner.getHeight() - v.getHeight()) / 2);
-                    } else {
-                        Log.d("MyDragListener_ondrag()","Orientation undefined");
                     }
                     break;
                 case DragEvent.ACTION_DRAG_ENDED:
@@ -823,28 +690,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
             return true;
         }
     }
-//================================================================================
-    // Temperature trigger related functions
-    /**
-     * Task to run on UI thread for alarms
-     */
-    class AlarmTask implements Runnable {
-        boolean mIsTriggerAlarmOverTemp, mIsTriggerAlarmUnderTemp;
-        AlarmTask(boolean isTriggerOver, boolean isTriggerUnder) {
-            mIsTriggerAlarmOverTemp = isTriggerOver;
-            mIsTriggerAlarmUnderTemp = isTriggerUnder;
-        }
-        public void run() {
-            mAlarmOverTemp.setBackgroundColor(mIsTriggerAlarmOverTemp? Color.RED : Color.TRANSPARENT);
-            mAlarmUnderTemp.setBackgroundColor(mIsTriggerAlarmUnderTemp? Color.CYAN : Color.TRANSPARENT);
-            if (mIsTriggerAlarmOverTemp || mIsTriggerAlarmUnderTemp) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    mVib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                else
-                    mVib.vibrate(200);
-            }
-        }
-    }
 
     // Temperature text broadcast receiver
     private BroadcastReceiver TemperatureBroadcastReceiver = new BroadcastReceiver() {
@@ -853,28 +698,17 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
             final int view_width = mCameraView.getWidth();
             final int view_height = mCameraView.getHeight();
             final int layout_height = mActivityMain.getHeight();
+            // Update frame stats
             final Temp_stat tmpStat = new Temp_stat(temp_stat);
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                if(mCameraView.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                    if (!isFlip)
-                        tempStr = getTempAtPoint((int) (mCrosshair.getX() + mCrosshair.getWidth() / 2), (int) (mCrosshair.getY() + mCrosshair.getHeight() / 2 - (layout_height - view_height) / 2), view_width, view_height, !isShowCelsius());
-                    else
-                        tempStr = getTempAtPoint((int) (view_width - (mCrosshair.getX() + mCrosshair.getWidth() / 2)), (int) (mCrosshair.getY() + mCrosshair.getHeight() / 2 - (layout_height - view_height) / 2), view_width, view_height, !isShowCelsius());
-                } else {
-                    if (!isFlip)
-                        tempStr = getTempAtPoint((int) (mCrosshair.getX() + mCrosshair.getWidth() / 2 - mTopBar.getWidth()
-                        ), (int) (mCrosshair.getY() + mCrosshair.getHeight() / 2 - (layout_height - view_height) / 2), view_width, view_height, !isShowCelsius());
-                    else
-                        tempStr = getTempAtPoint((int) (view_width - (mCrosshair.getX() + mCrosshair.getWidth() / 2) + mTopBar.getWidth()), (int) (mCrosshair.getY() + mCrosshair.getHeight() / 2 - (layout_height - view_height) / 2), view_width, view_height, !isShowCelsius());
-                }
-                mTempTextView.setText(String.valueOf(tempStr));
+                    final int thermalX = (int) ((float)pointX / (float)view_width * THERMAL_DATA_WIDTH);
+                    final int thermalY = (int) ((float)pointY / (float)view_height * THERMAL_DATA_HEIGHT);
 
-                mTempStd.setText("Std: " + String.format("%.2f", tmpStat.getStdev()));
-                mTempMin.setText("Min: " + String.format("%.1f",Double.valueOf(Float.toString(tmpStat.getMin())) / 10) + "\u00B0C");
-                mTempMax.setText("Max: " + String.format("%.1f",Double.valueOf(Float.toString(tmpStat.getMax())) / 10) + "\u00B0C");
+                    tempStr = getTempAtPoint(pointX, pointY, view_width, view_height, !isShowCelsius());
+                    mTempTextView.setText("(" + thermalX + "," + thermalY + ") :" + String.valueOf(tempStr));
                 }
             });
         }
@@ -915,49 +749,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         return mCameraHandler != null ? mCameraHandler.resetValue(flag) : 0;
     }
 
-    private void setColorBar(int palette) {
-        switch (palette) {
-            case 2:
-                mColorBar.setColorSeeds(R.array.heatiron_colors);
-                break;
-            case 3:
-                mColorBar.setColorSeeds(R.array.viridis_colors);
-                break;
-            case 4:
-                mColorBar.setColorSeeds(R.array.magma_colors);
-                break;
-            case 5:
-                mColorBar.setColorSeeds(R.array.parula_colors);
-                break;
-            case 6:
-                mColorBar.setColorSeeds(R.array.bezier_colors);
-                break;
-            case 7:
-                mColorBar.setColorSeeds(R.array.brewerblues_colors);
-                break;
-            case 8:
-                mColorBar.setColorSeeds(R.array.bw_colors);
-                break;
-            case 9:
-                mColorBar.setColorSeeds(R.array.autumn_colors);
-                break;
-            case 10:
-                mColorBar.setColorSeeds(R.array.cool_colors);
-                break;
-            case 11:
-                mColorBar.setColorSeeds(R.array.hsv_colors);
-                break;
-            case 12:
-                mColorBar.setColorSeeds(R.array.jet_colors);
-                break;
-            case 13:
-                mColorBar.setColorSeeds(R.array.spring_colors);
-                break;
-            default:
-                mColorBar.setColorSeeds(R.array.basic_colors);
-        }
-    }
-
     private int getColorPaletteNum() {
         String s1 = mSP.getString("pref_color_palette", getString(R.string.pref_color_palette_default));
         try {
@@ -965,13 +756,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         } catch (NullPointerException npe) {
             Log.d("Null pointer: %s",npe.getMessage());
         }
-        // Update color bar for any changes of palette number
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setColorBar(paletteNum);
-            }
-        });
+
         return paletteNum;
     }
 
@@ -995,7 +780,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         }
 
         float temp = mCameraHandler.getTemperature(actualX, actualY);
-
         String suffix;
         if (useFahrenheit) {
             temp = temp * 9.0f/5.0f + 32;
@@ -1019,38 +803,15 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
             mRecordButton.setVisibility(View.VISIBLE);
             mDisplayModeButton.setVisibility(View.VISIBLE);
             mTempTextView.setVisibility(View.VISIBLE);
-            mCrosshair.setVisibility(View.VISIBLE);
-            mAlarmOverTemp.setVisibility(View.VISIBLE);
-            mAlarmUnderTemp.setVisibility(View.VISIBLE);
             mFlipButton.setVisibility(View.VISIBLE);
-            mCheckBox.setVisibility(View.VISIBLE);
-            mColorBar.setVisibility(View.VISIBLE);
-            mTempMin.setVisibility(View.VISIBLE);
-            mTempMax.setVisibility(View.VISIBLE);
-            mTempStd.setVisibility(View.VISIBLE);
         }
         else {
             mCaptureButton.setVisibility(View.INVISIBLE);
             mRecordButton.setVisibility(View.INVISIBLE);
             mDisplayModeButton.setVisibility(View.INVISIBLE);
             mTempTextView.setVisibility(View.INVISIBLE);
-            mCrosshair.setVisibility(View.INVISIBLE);
-            mAlarmOverTemp.setVisibility(View.INVISIBLE);
-            mAlarmUnderTemp.setVisibility(View.INVISIBLE);
             mFlipButton.setVisibility(View.INVISIBLE);
-            mCheckBox.setVisibility(View.INVISIBLE);
-            mColorBar.setVisibility(View.INVISIBLE);
-            mTempMin.setVisibility(View.INVISIBLE);
-            mTempMax.setVisibility(View.INVISIBLE);
-            mTempStd.setVisibility(View.INVISIBLE);
         }
-    }
-
-    private void resetAlarmAppearance() {
-        mAlarmOverTemp.setVisibility(View.INVISIBLE);
-        mAlarmOverTemp.setBackgroundColor(Color.TRANSPARENT);
-        mAlarmUnderTemp.setVisibility(View.INVISIBLE);
-        mAlarmUnderTemp.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private final void openSettings(){
@@ -1105,7 +866,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         if (mCameraHandler != null){
             mCameraHandler.setThermalEnable(mShowThermal);
             mCameraHandler.setCmosEnable(mShowCIS);
-            mCameraHandler.SetMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
+            mCameraHandler.setMeridianParams(getColorPaletteNum(), xThermalImageShift, yThermalImageShift);
         }
 
         // hide/show temperature
@@ -1119,10 +880,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                 if (mAnnotationView != null) {
                     mAnnotationView.clearAnnotations();
                 }
-                if(mShowThermal)
-                    mCheckBox.setVisibility(View.VISIBLE);
-                else
-                    mCheckBox.setVisibility(View.INVISIBLE);
             }
         });
 

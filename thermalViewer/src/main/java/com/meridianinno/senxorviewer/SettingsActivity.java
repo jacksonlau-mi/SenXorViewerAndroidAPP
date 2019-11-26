@@ -117,15 +117,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
 
         private ConversionHelper mHelper;
 
-        private void resetAlarmSummary() {
-            final EditTextPreference upper = (EditTextPreference)findPreference("pref_over_temp_alarm_value");
-            final EditTextPreference lower = (EditTextPreference)findPreference("pref_under_temp_alarm_value");
-            final String unitValue = ((ListPreference)findPreference("pref_temp_unit")).getValue();
-            String suffix = getTempUnitDisplaySuffix(unitValue);
-            upper.setSummary(upper.getText() + suffix);
-            lower.setSummary(lower.getText() + suffix);
-        }
-
         String getTempUnitDisplaySuffix(String unitValue) {
             return unitValue.equals(getString(R.string.kelvin_value))? " K" :
                     unitValue.equals(getString(R.string.degree_c_value))? " \u00B0C" : " \u00B0F";
@@ -136,52 +127,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
             PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
-
-            resetAlarmSummary();
-
-            // Reduce lookup times by using class member variables
-            mHelper = new ConversionHelper(getString(R.string.degree_c_value), getString(R.string.degree_f_value), getString(R.string.kelvin_value));
-
-            findPreference("pref_temp_unit").setOnPreferenceChangeListener(
-                    new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        final EditTextPreference upper = (EditTextPreference)findPreference("pref_over_temp_alarm_value");
-                        final EditTextPreference lower = (EditTextPreference)findPreference("pref_under_temp_alarm_value");
-                        final double upperOldTemp = Double.valueOf(upper.getText());
-                        final double lowerOldTemp = Double.valueOf(lower.getText());
-                        final String oldUnit = ((ListPreference)preference).getValue();
-                        final String newUnit = newValue.toString();
-                        final double upperNewTemp = mHelper.convertTemperatureByUnitString(upperOldTemp, oldUnit, newUnit);
-                        final double lowerNewTemp = mHelper.convertTemperatureByUnitString(lowerOldTemp, oldUnit, newUnit);
-                        final String upperNewText = String.format(Locale.getDefault(), "%2.1f", upperNewTemp);
-                        final String lowerNewText = String.format(Locale.getDefault(), "%2.1f", lowerNewTemp);
-                        // TODO: handle NaN in upper and lower NewTemps
-                        upper.setText(upperNewText);
-                        lower.setText(lowerNewText);
-                        String suffix = getTempUnitDisplaySuffix(newUnit);
-                        upper.setSummary(upperNewText + suffix);
-                        lower.setSummary(lowerNewText + suffix);
-                        return true;
-                        }
-                    }
-            );
-
-            Preference.OnPreferenceChangeListener alarmTempChangeListener =
-                new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        final String unitValue = ((ListPreference)findPreference("pref_temp_unit")).getValue();
-                        String suffix = getTempUnitDisplaySuffix(unitValue);
-                        preference.setSummary(newValue.toString() + suffix);
-                        return true;
-                    }
-                };
-
-            findPreference("pref_over_temp_alarm_value")
-                    .setOnPreferenceChangeListener(alarmTempChangeListener);
-            findPreference("pref_under_temp_alarm_value")
-                    .setOnPreferenceChangeListener(alarmTempChangeListener);
         }
 
         @Override

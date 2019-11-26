@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 def version = 1
-def patch = 64
-def edition = 7
+def patch = 0
+def edition = 0
 
 android {
     compileSdkVersion 27
@@ -15,6 +15,8 @@ android {
         versionName "${version}.${patch}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        ndk.abiFilters 'armeabi-v7a','arm64-v8a'
     }
     buildTypes {
         release {
@@ -40,8 +42,8 @@ dependencies {
     })
     compile project(':usbCameraCommon')
     compile project(':opencv')
-    compile project(':colorbar')
     compile project(':facedetection-release')
+    compile project(':libuvccamera-release')
     compile 'com.android.support:appcompat-v7:27.1.1'
     compile 'ch.acra:acra:4.9.0'
     compile 'com.android.support:support-v4:27.1.1'

@@ -108,10 +108,8 @@ abstract class AbstractUVCCameraHandler extends Handler {
 
 	private final WeakReference<AbstractUVCCameraHandler.CameraThread> mWeakThread;
 	private volatile boolean mReleased;
-	protected static volatile String display_temp;
 	private static int mainLayoutHeight;
     private boolean isThermalEnable = false, isCmosEnable = false;
-    private static ImageView mCrossHair;
     private static boolean misFlip;
 
     // Meridian mods
@@ -129,9 +127,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
         mainLayoutHeight = height;
     }
 
-    public void setCaptureElement(String temp, ImageView CrossHair, boolean isFlip) {
-		display_temp = temp;
-		mCrossHair = CrossHair;
+    public void setCaptureElement(boolean isFlip) {
 		misFlip = isFlip;
 	}
 
@@ -152,15 +148,19 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		thread.setmIsCmosEnable(enable);
 	}
 
-	public void SetMeridianParams(int numPalette, int xShift, int yShift){
+	public void setMeridianParams(int numPalette, int xShift, int yShift){
 		final CameraThread thread = mWeakThread.get();
-		thread.SetMeridianParams(numPalette, xShift, yShift);
+		thread.setMeridianParams(numPalette, xShift, yShift);
 	}
 
-
-	public void setParaletteHDR(boolean input){
+	public void setIsAutoScale(boolean input){
 		final CameraThread thread = mWeakThread.get();
-		thread.setParaletteHDR(input);
+		thread.setIsAutoScale(input);
+	}
+
+	public void setPaletteRange(float min, float max) {
+		final CameraThread thread = mWeakThread.get();
+		thread.setPaletteRange(min, max);
 	}
 
 	public int getWidth() {
@@ -482,31 +482,35 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			super.finalize();
 		}
 
-		public void setmIsThermalEnable(boolean enable){
+		private void setmIsThermalEnable(boolean enable){
             this.mIsThermalEnable = enable;
             if (mUVCCamera != null){
                 mUVCCamera.enableThermalLayer(enable);
             }
         }
 
-		public void setmIsCmosEnable(boolean enable){
+		private void setmIsCmosEnable(boolean enable){
 			this.mIsCmosEnable = enable;
 			if (mUVCCamera != null){
 				mUVCCamera.enableCmosLayer(enable);
 			}
 		}
 
-		public void SetMeridianParams(int numPalette, int xShift, int yShift){
+		private void setMeridianParams(int numPalette, int xShift, int yShift){
 			if (mUVCCamera != null){
-				mUVCCamera.SetMeridianParams(numPalette, xShift, yShift);
+				mUVCCamera.setMeridianParams(numPalette, xShift, yShift);
 			}
 		}
 
-        public void setParaletteHDR(boolean input){
-            if (mUVCCamera != null){
-                mUVCCamera.setParaletteHDR(input);
-            }
-        }
+		private void setIsAutoScale(boolean input){
+			if (mUVCCamera != null){
+				mUVCCamera.setIsAutoScale(input);
+			}
+		}
+
+		private void setPaletteRange(float min, float max) {
+			mUVCCamera.setPaletteRange(min, max);
+		}
 
 		public AbstractUVCCameraHandler getHandler() {
 			if (DEBUG) Log.v(TAG_THREAD, "getHandler:");
@@ -586,30 +590,16 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		}
 
         private Bitmap putTxt2Bitmap(Bitmap source) {
-			Bitmap bmCrosshair,bmCrosshair_cpy, result;
+			Bitmap result;
 			Matrix m = new Matrix();
 
 			result = Bitmap.createBitmap(source);
-            //result = Bitmap.createBitmap(source.getWidth(),source.getHeight(),source.getConfig());
-			bmCrosshair = ((BitmapDrawable) mCrossHair.getDrawable()).getBitmap();
-			bmCrosshair_cpy = bmCrosshair.copy(bmCrosshair.getConfig(), true);
-
 			Canvas canvas = new Canvas(result);
-            Paint paintTmp = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paintTmp.setTextSize(30);
-            paintTmp.setStyle(Paint.Style.FILL);
-            paintTmp.setStrokeWidth(1.0f);
-            Rect rectText = new Rect();
-            paintTmp.getTextBounds(display_temp, 0, display_temp.length(), rectText);
-
 			if(misFlip) {
 				m.setScale(-1.0f, 1.0f);
 				m.postTranslate(canvas.getWidth(),0);
 				canvas.drawBitmap(result,m,null);
 			}
-			canvas.drawBitmap(bmCrosshair_cpy, mCrossHair.getX(), (int)(mCrossHair.getY() + mCrossHair.getHeight()/2 - (mainLayoutHeight - result.getHeight())/2), null);
-			//	Draw text
-			canvas.drawText(display_temp,canvas.getWidth() - rectText.width(), rectText.height(), paintTmp);
             return result;
         }
 

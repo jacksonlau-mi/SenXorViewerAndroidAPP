@@ -1,4 +1,3 @@
 include ':thermalViewer', ':facedetection-release', ':libuvccamera-release'
 include ':usbCameraCommon'
 include ':opencv'
-include ':colorbar'

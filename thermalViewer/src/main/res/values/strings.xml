@@ -106,19 +106,5 @@
     <string name="pref_face_detect_enabled_title">Face Detection (beta)</string>
     <string name="pref_face_detect_enabled_default">false</string>
 
-    <!-- Over and under temperature alarms -->
-    <string name="pref_alarm_enabled_default">false</string>
-
-    <string name="pref_over_temp_alarm_enabled_key">pref_over_temp_alarm_enabled</string>
-    <string name="pref_over_temp_alarm_enabled_title">Over-temperature Alarm</string>
-    <string name="pref_over_temp_alarm_value_key">pref_over_temp_alarm_value</string>
-    <string name="pref_over_temp_alarm_value_title">Alarm Triggering Above:</string>
-    <string name="pref_over_temp_alarm_value_default">30</string>
-
-    <string name="pref_under_temp_alarm_enabled_key">pref_under_temp_alarm_enabled</string>
-    <string name="pref_under_temp_alarm_enabled_title">Under-temperature Alarm</string>
-    <string name="pref_under_temp_alarm_value_key">pref_under_temp_alarm_value</string>
-    <string name="pref_under_temp_alarm_value_title">Alarm Triggering Below:</string>
-    <string name="pref_under_temp_alarm_value_default">15</string>
 
 </resources>
