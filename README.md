@@ -8,7 +8,7 @@ Details please check the SenXorViewer Android App Note.
 
 1. (Download Android NDK r14b)[https://developer.android.com/ndk/downloads/older_releases.html] 
 
-1. Extract the downloaded archive file to some location on your filesystem.
+1. Extract the downloaded archive file to somewhere on your filesystem.
 
 1. Launch Android Studio. 
 
