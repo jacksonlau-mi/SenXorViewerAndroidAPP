@@ -1,5 +1,5 @@
 # SenXorViewer
-The SenXorViewer APP is the release version of the android software from Meridian Innovation Limited SenXorViewer V1.64.
+The SenXorViewer APP is the release version of the android software from Meridian Innovation Limited SenXorViewer.
 Details please check the SenXorViewer Android App Note.
 
 ## Setup
