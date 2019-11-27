@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import org.opencv.core.Mat;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
@@ -27,15 +26,9 @@ import android.widget.TextView;
 import android.hardware.usb.UsbManager;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import android.graphics.Bitmap;
-
 import com.meridianinno.Model.Temp_stat;
-import com.meridianinno.facedetection.FaceDetect;
-import com.meridianinno.utility.UpsampleThermal;
 import com.serenegiant.common.BaseActivity;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
@@ -44,10 +37,6 @@ import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.widget.CameraViewInterface;
 import com.serenegiant.widget.UVCCameraTextureView;
-
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.serenegiant.usb.UVCCamera.PIXEL_FORMAT_RGBX;
@@ -91,8 +80,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
      */
     public static final int THERMAL_DATA_WIDTH = 32;
     public static final int THERMAL_DATA_HEIGHT = 32;
-    public static final int THERMAL_EXPANDED_WIDTH = FaceDetect.MaxThermalRows;
-    public static final int THERMAL_EXPANDED_HEIGHT = FaceDetect.MaxThermalCols;
 
     // for accessing USB
     private USBMonitor mUSBMonitor;
@@ -258,32 +245,12 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                 // save a copy of the bitmap
                 mScreenBitmap.copyPixelsFromBuffer(frame);  // note, format from frame to mScreenBitmap must match
 
-                // detect face
-                List<FaceDetect.DetectResult> detectResults = new ArrayList<>();
-                Bitmap detectedImage = null;
-                if (isDetectFace() && mShowThermal) {
-                    FaceDetect faceDetect = new FaceDetect();
-
-                    int[] expanded_thermal = UpsampleThermal.upsample(thermal_data, THERMAL_DATA_WIDTH, THERMAL_DATA_HEIGHT, THERMAL_EXPANDED_WIDTH, THERMAL_EXPANDED_HEIGHT, UpsampleThermal.UPSAMPLE_MODE.BILINEAR);
-                    Mat[] maskAndContours = faceDetect.getMonoChromeImageEx( expanded_thermal );
-                    Mat contourImage = maskAndContours[1];
-                    detectResults = faceDetect.processContours( contourImage );
-                    Log.d(TAG, Integer.toString(detectResults.size()));
-                    //printThermalData(thermal_data, detectResults);
-                    if (DISPLAY_DEBUG_IMAGES) {
-                        Mat monoChromeImage = maskAndContours[0];
-                        detectedImage = faceDetect.matToBitmap(monoChromeImage);
-                    }
-                }
+                // detect face, apply any detection here
+                Bitmap detectedImage;
 
                 if (DISPLAY_DEBUG_IMAGES) {    // should only be used during development
                     // draw bitmap to screen
                     mAnnotationView.drawBitmap(detectedImage != null ? detectedImage : mScreenBitmap);
-                } else {
-                    // draw annotation rects
-                    if (mShowThermal) {
-                        mAnnotationView.drawAnnotationRects(detectResults, PREVIEW_WIDTH, PREVIEW_HEIGHT, THERMAL_EXPANDED_WIDTH, THERMAL_EXPANDED_HEIGHT, xThermalImageShift, yThermalImageShift, isFlip);
-                    }
                 }
             }
         };
@@ -302,12 +269,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UVCCameraHandler.TEMPERATURE_STRING);
         this.registerReceiver(TemperatureBroadcastReceiver, intentFilter);
-
-        // init opencv lib
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
-        }
 
         usbmanager = (UsbManager) getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> uMap = usbmanager.getDeviceList();
@@ -919,12 +880,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                 getString(R.string.pref_temp_unit_key), getString(R.string.degree_c_value)));
     }
 
-    // TODO: throw exception if the key is not found in SharedPreference
-    private boolean isDetectFace() {
-        return mSP.getBoolean(
-                getString(R.string.pref_face_detect_enabled_key), false);
-    }
-
     private void changePreference(String key, int value) {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putInt(key, value);
@@ -936,23 +891,4 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
         editor.putString(key, value);
         editor.commit();
     }
-
-    // For OpenCV initialization
-    //================================================================================
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
-                    Log.d(TAG, "OpenCV intialized successfully");
-
-                } break;
-                default:
-                {
-                    super.onManagerConnected(status);
-                } break;
-            }
-        }
-    };
 }

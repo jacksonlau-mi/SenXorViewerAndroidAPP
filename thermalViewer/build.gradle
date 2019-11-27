@@ -41,8 +41,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile project(':usbCameraCommon')
-    compile project(':opencv')
-    compile project(':facedetection-release')
     compile project(':libuvccamera-release')
     compile 'com.android.support:appcompat-v7:27.1.1'
     compile 'ch.acra:acra:4.9.0'

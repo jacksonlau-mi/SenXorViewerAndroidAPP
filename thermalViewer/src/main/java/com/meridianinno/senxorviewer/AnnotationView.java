@@ -14,13 +14,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.meridianinno.facedetection.FaceDetect;
 import com.serenegiant.encoder.IVideoEncoder;
 import com.serenegiant.widget.CameraViewInterface;
 
-import java.util.List;
-
-import static com.meridianinno.facedetection.FaceDetect.MatBuffer;
 
 /**
  * Created by frankMac on 1/29/18.
@@ -77,52 +73,6 @@ public class AnnotationView extends SurfaceView implements SurfaceHolder.Callbac
             if (canvas != null) {
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, canvas.getWidth(), canvas.getHeight(), true);;
                 canvas.drawBitmap(scaledBitmap, 0, 0, new Paint());
-                mHolder.unlockCanvasAndPost(canvas);
-            }
-        }
-    }
-
-    public void drawAnnotationRects(List<FaceDetect.DetectResult> detectResults, int prevWidth, int prevHeight, int thermalWidth, int thermalHeight, int xThermalImageShift, int yThermalImageShift, boolean isFlip) {
-        if (mAnnotationSurface != null && mAnnotationSurface.isValid()) {
-            final Canvas canvas = mHolder.lockCanvas();
-            if (canvas != null) {
-                // erase previous rects
-                canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-
-                for (FaceDetect.DetectResult detectResult : detectResults) {
-                    if (!detectResult.isFace) {
-                        continue;
-                    }
-
-                    final float sx = canvas.getWidth() / (float) prevWidth;
-                    final float sy = canvas.getHeight() / (float) prevHeight;
-                    final float xThermalScale = prevWidth/thermalWidth;      // 640/32, thermal has 1:1 aspect ratio
-                    final float yThermalScale = prevHeight/thermalHeight;      // 480/32, thermal has 1:1 aspect ratio
-
-
-                    // convert to srcWidth/srcHeight coordinates, e.g., 640 x 480 coordinates
-                    int left = (int)(((float)detectResult.rect.x - MatBuffer + 0.5) * xThermalScale) + xThermalImageShift;
-                    int top =  (int)(((float)detectResult.rect.y - MatBuffer + 0.5) * yThermalScale) + yThermalImageShift;
-                    int right = left + (int)(detectResult.rect.width * xThermalScale);
-                    int bottom = top + (int)(detectResult.rect.height * yThermalScale);
-
-                    // convert to canvas coordinates
-                    left = (int) (left * sx + 0.5);
-                    top = (int) (top * sy + 0.5);
-                    right = (int) (right * sx + 0.5);
-                    bottom = (int) (bottom * sy + 0.5);
-
-                    if(isFlip) {
-                        int temp = left;
-                        left = canvas.getWidth() - right;
-                        right = canvas.getWidth() - temp;
-                    }
-
-                    // draw
-                    //Log.d(TAG, "draw rect "+left+", "+top+", "+right+", "+bottom);
-                    canvas.drawRect(left, top, right, bottom, paint);
-                }
-
                 mHolder.unlockCanvasAndPost(canvas);
             }
         }

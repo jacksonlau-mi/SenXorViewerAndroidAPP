@@ -1,3 +1,2 @@
-include ':thermalViewer', ':facedetection-release', ':libuvccamera-release'
+include ':thermalViewer', ':libuvccamera-release'
 include ':usbCameraCommon'
-include ':opencv'

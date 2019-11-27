@@ -101,10 +101,4 @@
         <!-- TODO: Add indices of future color palettes here -->
     </string-array>
 
-    <!-- Face Detection Strings -->
-    <string name="pref_face_detect_enabled_key">pref_face_detect_enabled</string>
-    <string name="pref_face_detect_enabled_title">Face Detection (beta)</string>
-    <string name="pref_face_detect_enabled_default">false</string>
-
-
 </resources>
