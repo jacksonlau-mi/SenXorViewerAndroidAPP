@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
     private UVCCameraTextureView mCameraView;
     private RelativeLayout mActivityMain;
     private int paletteNum = 1;
-    private float scaleMin = 21.0f, scaleMax = 36.0f;
+    private float scaleMin = 15.0f, scaleMax = 36.0f;
 
     private String tempStr = "";
     private Temp_stat temp_stat = new Temp_stat();
@@ -380,6 +380,7 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                     sleep(2500);
                     // Init Meridian Params
                     mCameraHandler.setMeridianParams(getColorPaletteNum(), 0, 0);
+                    mCameraHandler.setPaletteRange(scaleMin, scaleMax);
                     startPreview();
                 }
             } catch (InterruptedException e) {
@@ -528,7 +529,6 @@ public class MainActivity extends BaseActivity implements CameraDialog.CameraDia
                         }
                         if (mShowCIS && mShowThermal) {
                             mShowThermalShiftEditMode = !mShowThermalShiftEditMode;
-
                             if (mShowThermalShiftEditMode) {
                                 mThermalShiftLeft.setText(Integer.toString(xThermalImageShift));
                                 mThermalShiftLeft.setVisibility(View.VISIBLE);
