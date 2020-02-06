@@ -1,5 +1,5 @@
 # SenXorViewer
-The SenXorViewer APP is the release version of the android project from Meridian Innovation Limited for XCAM series [SenXorViewer](https://play.google.com/store/apps/details?id=com.meridianinno.senxorviewer&hl=zh-TW).
+The SenXorViewer APP is the release version of the android project from Meridian Innovation Limited for **XCAM** series [SenXorViewer](https://play.google.com/store/apps/details?id=com.meridianinno.senxorviewer&hl=zh-TW).
 Details please check the SenXorViewer Android App Note.
 
 ## Setup
